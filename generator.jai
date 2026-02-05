@@ -172,6 +172,11 @@ compile_libraries :: (options: Options) -> success := false, error := "" {
         array_add(*extra_clang_arguments, "-DGLFW_INCLUDE_NONE");
 
         array_add(*source_files, tprint("%/include/GLFW/glfw3.h", source_dir));
+
+        #if OS == .WINDOWS {
+            array_add(*extra_clang_arguments, "-DGLFW_EXPOSE_NATIVE_WIN32");
+            array_add(*source_files, tprint("%/include/GLFW/glfw3native.h", source_dir));
+        }
     }
 
     if !generate_bindings(bindings_options, tprint("%/bindings.jai", output_dir))
@@ -181,6 +186,8 @@ compile_libraries :: (options: Options) -> success := false, error := "" {
 }
 
 BINDINGS_FOOTER :: #string END
+HWND :: *void;
+
 #if GLFW_USE_STATIC_LIB {
     #if OS == .MACOS                        glfw :: #library,no_dll "macos/libglfw3";
     #if OS == .LINUX    && CPU == .X64      glfw :: #library,no_dll "linux/x64/libglfw3";
